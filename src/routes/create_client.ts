@@ -1,28 +1,32 @@
-import express from 'express';
+import * as express from 'express';
+import { Request, Response } from 'express';
 import { Client } from '../entities/Client';
+import { getRepository } from 'typeorm';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
-router.post('/api/client', async (req, res) => {
-	const {
-		firstName,
-		lastName,
-		email,
-		cardNumber,
-		balance,
-	} = req.body;
+router.post('/api/client', async (req: Request, res: Response) => {
+    const {
+        firstName,
+        lastName,
+        email,
+        cardNumber,
+        balance,
+    } = req.body;
 
-	const client = Client.create({
-		first_name: firstName,
-		last_name: lastName,
-		email,
-		card_number: cardNumber,
-		balance,
-	});
+    const client = new Client();
+    client.first_name = firstName;
+    client.last_name = lastName;
+    client.email = email;
+    client.card_number = cardNumber;
+    client.balance = balance;
 
-	await client.save();
-
-	return res.json(client);
+    const clientRepository = getRepository(Client);
+    await clientRepository.save(client);
+	
+	res.status(200).json({ results: client })
+    // return res.json(client);
+    return;
 });
 
 export { router as createClientRouter };
